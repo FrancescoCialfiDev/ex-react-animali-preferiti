@@ -1,14 +1,31 @@
+<!-- index.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My favourite animals</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>I miei animali Preferiti</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
+    <header>
+        <h1>I miei animali Preferiti</h1>
+    </header>
+    <main>
+        <figure>
+            <img src="https://picsum.photos/400/300" alt="Immagine Casuale">
+        </figure>
+        <div class="lista-animali"></div>
+    </main>
+    <footer>
+        <p>Creato con amore da... un collega sbadato! 🐾</p>
+    </footer>
+    <script type="text/babel" src="main.jsx"></script>
 </body>
 
 </html>
