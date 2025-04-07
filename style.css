@@ -34,18 +34,6 @@ img {
 .lista-animali {
   width: 100%;
 }
-button {
-  background-color: green;
-  padding: 10px;
-  border: 0;
-  border-radius: 10px;
-  color: white;
-}
-button:hover {
-  cursor: pointer;
-  background-color: rgba(0, 128, 0, 0.582);
-}
-
 .modal-container {
   position: fixed;
   top: 0;
@@ -62,11 +50,6 @@ button:hover {
   padding: 20px;
   border-radius: 5px;
 }
-input {
-  padding: 5px;
-  border-radius: 5px;
-  border: 1px solid rgba(128, 128, 128, 0.267);
-}
-.modalContent {
-  padding-bottom: 10px;
+.d-flex {
+  display: flex;
 }
