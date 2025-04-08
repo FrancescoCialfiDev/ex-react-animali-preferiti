@@ -5,9 +5,9 @@
  - Una lista <ul> statica che viene creata a partire da un array di stringhe (animals) dove ciascuna stringa rappresenta il nome di un animale.*/
 
 // const animali = ["Corvo", "Maiale", "Papera", "Gatto", "Suricato", "Marmotta"]
-// 
+//
 // const Componente = () => {
-// 
+//
 //     return (
 //         <>
 //             <details>
@@ -19,7 +19,7 @@
 //         </>
 //     )
 // }
-// 
+//
 // ReactDOM.createRoot(document.querySelector(".lista-animali")).render(<Componente />)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -31,18 +31,18 @@
 // - Usa un array predefinito per scegliere casualmente:
 
 // const animaliDefault = ["Corvo", "Maiale", "Papera", "Gatto", "Suricato", "Marmotta"]
-// 
+//
 // const Componente = () => {
-// 
+//
 //     const { useState } = React
 //     const [animals, setAnimals] = useState([])
-// 
+//
 //     function randomAnimal() {
 //         const randomIndex = Math.floor(Math.random() * animaliDefault.length)
 //         const randomAnimal = animaliDefault[randomIndex]
 //         setAnimals([...animals, randomAnimal])
 //     }
-// 
+//
 //     return (
 //         <>
 //             <button onClick={randomAnimal}>Aggiungi Animale</button>
@@ -75,22 +75,31 @@ Obiettivo: L’utente può aggiungere animali specifici utilizzando la modale.
 */
 
 // const animaliDefault = ["Corvo", "Maiale", "Papera", "Gatto", "Suricato", "Marmotta"]
-// 
+//
 // const Componente = () => {
-// 
+//
 //     const { useState } = React
 //     const [animals, setAnimals] = useState([])
 //     const [value, setValue] = useState(false)
-// 
+//     const [animalValue, setAnimalValue] = useState("")
+//
 //     function getInput() {
-//         const input = document.getElementById("addAnimal")
-//         setAnimals([...animals, input.value])
+//         if (!animalValue) return;
+//         setAnimals(curr => [...curr, animalValue])
+//         setAnimalValue("")
+//         setValue(false)
 //     }
-// 
-// 
+//
+//
 //     return (
 //         <>
-//             <Modal title={"Inserisci un animale"} content={<input type="text" name="addAnimal" id="addAnimal" placeholder="Inserisci un animale" />} show={value} onClose={() => { setValue(false) }} onConfirm={getInput} />
+//             <Modal
+//                 title={"Inserisci un animale"}
+//                 content={<input type="text" name="addAnimal" id="addAnimal" placeholder="Inserisci un animale" value={animalValue} onChange={(e) => { setAnimalValue(e.target.value) }} />}
+//                 show={value}
+//                 onClose={() => { setValue(false) }}
+//                 onConfirm={getInput}
+//             />
 //             <button onClick={() => { setValue(true) }}>Aggiungi Animale</button>
 //             <details>
 //                 <summary>Animali</summary>
@@ -101,8 +110,8 @@ Obiettivo: L’utente può aggiungere animali specifici utilizzando la modale.
 //         </>
 //     )
 // }
-// 
-// 
+//
+//
 // function Modal({
 //     title,
 //     content,
@@ -124,76 +133,77 @@ Obiettivo: L’utente può aggiungere animali specifici utilizzando la modale.
 //         document.body
 //     )
 // }
-// 
+//
 // ReactDOM.createRoot(document.querySelector(".lista-animali")).render(<Componente />)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-// 🎯 Bonus: Utilizzare l'API per Creare Card
+//🎯 Bonus: Utilizzare l'API per Creare Card
 
-const animaliDefault = ["Corvo", "Maiale", "Papera", "Gatto", "Suricato", "Marmotta"]
+const { useState } = React
 
 const Componente = () => {
 
-    const { useState } = React
-    const [animals, setAnimals] = useState([])
-    const [value, setValue] = useState(false)
-    const [loader, setLoader] = useState(false)
 
-    async function fetchData(url) {
+    const [animals, setAnimals] = useState([]) // Tiene il valore dell'array con gli animali
+    const [animalInput, setAnimalInput] = useState("") // Tiene il valore dell'animale inserito nel campo di input 
+    const [show, setShow] = useState(false) // Tiene il valore show per la modale
+    const [loader, setLoader] = useState(false) // Tiene il valore del loader di caricamento in attesa dei dati 
+    const [error, setError] = useState("")
+
+    const aggiungiAnimale = async () => {
+        setError("")
         setLoader(true)
         try {
-            const fetchData = await fetch(url)
-            const objParse = await fetchData.json()
-            return objParse
+            const response = await fetch(`https://boolean-spec-frontend.vercel.app/freetestapi/animals?search=${animalInput}`)
+            const [animalData] = await response.json()
+            if (!animalData) {
+                throw new Error("Animale non trovato")
+            }
+            const newAnimal = {
+                name: animalData.name || "Nessun nome trovato",
+                description: animalData.description || "Nessuna descrizione trovata",
+                image: animalData.image || null
+            }
+            setAnimals(curr => [...curr, newAnimal])
+
         } catch (error) {
+            console.log(error.message)
+            const message = error.message === "Animale non trovato" ? "Animale non trovato" : "Errore nella ricerca"
+            setError(message)
             console.error(error)
         } finally {
+            setShow(false)
+            setAnimalInput("")
             setLoader(false)
         }
 
     }
 
-    function getInput() {
-        const input = document.getElementById("addAnimal")
-        fetchData(`https://boolean-spec-frontend.vercel.app/freetestapi/animals?search=${input.value}`)
-            .then(res => {
-                if (res.length > 0) {
-                    setAnimals([...animals, { name: res[0].name, description: res[0].description, image: res[0].image }])
-                    alert("Animale inserito correttamente")
-                } else {
-                    alert("Animale non trovato")
-                }
-
-            })
-
-        setValue(false)
-    }
 
 
     return loader === false ? (
         <>
             <Modal
                 title={"Inserisci un animale"}
-                content={<input type="text" name="addAnimal" id="addAnimal" placeholder="Inserisci un animale" />}
-                show={value}
-                onClose={() => { setValue(false) }}
-                onConfirm={getInput}
+                content={<input type="text" name="addAnimal" id="addAnimal" placeholder="Inserisci un animale" value={animalInput} onChange={(e) => { setAnimalInput(e.target.value) }} />}
+                show={show}
+                onClose={() => { setShow(false) }}
+                onConfirm={aggiungiAnimale}
             />
-            <button onClick={() => { setValue(true) }}>Aggiungi Animale</button>
+            <button onClick={() => { setShow(true) }}>Aggiungi Animale</button>
             <details>
                 <summary>Animali</summary>
-                <ul>
-                    {animals.map((animale) =>
-                        <>
-                            <li>
-                                <h2>{animale.name}</h2>
-                                <p>{animale?.description ?? "Nessuna descrizione"}</p>
-                                <img src={animale.image} alt="Immagine" />
-                            </li>
-                        </>
-                    )}
-                </ul>
+                {error ? <div>{error}</div> : animals.map((animale, index) =>
+                    <div key={index}>
+                        <h2>{animale.name}</h2>
+                        <p>{animale.description}</p>
+                        <figure>
+                            <img src={animale.image} alt="" />
+                        </figure>
+                    </div>
+                )}
+
             </details>
         </>
     ) : <><h1>Loading...</h1></>
